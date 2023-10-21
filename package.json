@@ -1,0 +1,43 @@
+{
+  "name": "reveal-gamepad-controller-plugin",
+  "version": "1.0.0",
+  "description": "Reveal.js plugin allowing to control slides using any gamepad",
+  "scripts": {
+    "build": "tsc -b ./tsconfig.json",
+    "clean": "rm -rf ./build"
+  },
+  "dependencies": {
+    "reveal.js": "^4.6.1",
+    "typescript": "^5.2.2"
+  },
+  "exports": {
+    "./*": {
+      "esm": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "devDependencies": {
+    "@types/reveal.js": "^4.4.5"
+  },
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/cfrezier/reveal-gamepad-controller-plugin/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cfrezier/reveal-gamepad-controller-plugin"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "keywords": [
+    "reveal.js",
+    "plugin"
+  ],
+  "author": {
+    "email": "frezier@gmail.com",
+    "name": "Christophe Frézier"
+  },
+  "license": "MIT",
+  "main": "dist/index.js"
+}
