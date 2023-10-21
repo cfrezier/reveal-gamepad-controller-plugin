@@ -1,7 +1,7 @@
 export interface Mapping {
     buttons: Button[]
     cross: Cross[]
-    spotlight: Spotlight[]
+    analog: Analog[]
 }
 
 export interface Button {
@@ -16,7 +16,7 @@ export interface Cross {
     actions: CrossAction[]
 }
 
-export interface Spotlight {
+export interface Analog {
     name: string;
     xIdx: number;
     yIdx: number;
@@ -118,7 +118,7 @@ const RevealGamepadController = ((Reveal: any) => {
                     ]
                 }
             ],
-            spotlight: [
+            analog: [
                 {
                     name: 'Left Analog',
                     xIdx: 1,
@@ -222,15 +222,15 @@ const RevealGamepadController = ((Reveal: any) => {
                     previousButtonsKey = allPressedButtonsKeys;
 
                     // Managing analog sticks
-                    mapping.spotlight.forEach(sp => {
-                        const x = gp.axes[sp.xIdx];
-                        const y = gp.axes[sp.yIdx];
+                    mapping.analog.forEach(analog => {
+                        const x = gp.axes[analog.xIdx];
+                        const y = gp.axes[analog.yIdx];
 
-                        if (x > sp.deadZone || x < -sp.deadZone || y > sp.deadZone || y < -sp.deadZone) {
+                        if (x > analog.deadZone || x < -analog.deadZone || y > analog.deadZone || y < -analog.deadZone) {
                             window.dispatchEvent(new CustomEvent('analog', {
                                 detail: {
-                                    key: sp.name,
-                                    action: sp.action,
+                                    key: analog.name,
+                                    action: analog.action,
                                     x, y
                                 }
                             }));

@@ -89,8 +89,21 @@ You can define your own mapping by just giving an object as mapping:
                         ]
                     }
                 ],
-                pointer: [
-                    {name: 'Left Analog', idx: 3}
+                analog: [
+                  {
+                    name: 'Left Analog',
+                    xIdx: 1,
+                    yIdx: 0,
+                    deadZone: 0.01,
+                    action: REVEAL_ACTIONS.MOVE_SPOTLIGHT({multiplier: 30})
+                  },
+                  {
+                    name: 'Right Analog',
+                    xIdx: 5,
+                    yIdx: 2,
+                    deadZone: 0.01,
+                    action: REVEAL_ACTIONS.MOVE_SPOTLIGHT({multiplier: 30})
+                  }
                 ]
             }
         }
@@ -108,13 +121,13 @@ Check the console and you'll be able to identify which button is what idx etc.
 - For `Button` :
   - names are here for logging purposes
   - idx is the index of the button to scan in the `gamepad.buttons`
-  - action is the action that will be triggered on "keydown"
+  - action is the action that will be triggered on "keydown". It's a `() => void`.
 - For `Cross` :
     - names are here for logging purposes
     - idx is the index of the axis to scan in the `gamepad.axes`
-    - actions is an array of trigger options: at each loop, the cross emit the action which value is the closest to the axis value.
+    - actions is an array of trigger options: at each loop, the cross emit the action which value is the closest to the axis value. They are `() => void`.
     - Don't forget to have an action doing nothing in rest position of your pad.
-- For `Spotlight`:
+- For `Analog`:
   - names are here for logging purposes
   - xIdx and yIdx are the indexes of the axis to scan in the `gamepad.axes`
   - deadZone allows not to trigger if values are below a certain amount

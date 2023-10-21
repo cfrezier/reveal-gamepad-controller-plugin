@@ -84,7 +84,7 @@ const RevealGamepadController = ((Reveal) => {
                     ]
                 }
             ],
-            spotlight: [
+            analog: [
                 {
                     name: 'Left Analog',
                     xIdx: 1,
@@ -170,14 +170,14 @@ const RevealGamepadController = ((Reveal) => {
                     });
                     previousButtonsKey = allPressedButtonsKeys;
                     // Managing analog sticks
-                    mapping.spotlight.forEach(sp => {
-                        const x = gp.axes[sp.xIdx];
-                        const y = gp.axes[sp.yIdx];
-                        if (x > sp.deadZone || x < -sp.deadZone || y > sp.deadZone || y < -sp.deadZone) {
+                    mapping.analog.forEach(analog => {
+                        const x = gp.axes[analog.xIdx];
+                        const y = gp.axes[analog.yIdx];
+                        if (x > analog.deadZone || x < -analog.deadZone || y > analog.deadZone || y < -analog.deadZone) {
                             window.dispatchEvent(new CustomEvent('analog', {
                                 detail: {
-                                    key: sp.name,
-                                    action: sp.action,
+                                    key: analog.name,
+                                    action: analog.action,
                                     x, y
                                 }
                             }));
