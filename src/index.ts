@@ -1,7 +1,7 @@
 export interface Mapping {
     buttons: Button[]
     cross: Cross[]
-    pointer: Pointer[]
+    spotlight: Spotlight[]
 }
 
 export interface Button {
@@ -16,10 +16,15 @@ export interface Cross {
     actions: CrossAction[]
 }
 
-export interface Pointer {
-    name: string
-    idx: number
+export interface Spotlight {
+    name: string;
+    xIdx: number;
+    yIdx: number;
+    deadZone: number;
+    action: AnalogAction
 }
+
+export type AnalogAction = (x: number, y: number) => void;
 
 export interface CrossAction {
     name: string;
@@ -28,6 +33,14 @@ export interface CrossAction {
 }
 
 const RevealGamepadController = ((Reveal: any) => {
+    const spotlight = {
+        active: false,
+        spot: null as HTMLDivElement | null,
+        position: [0, 0],
+        max: [0, 0],
+        size: 100,
+    };
+
     const REVEAL_ACTIONS = ({
         LEFT: () => Reveal.left(),
         RIGHT: () => Reveal.right(),
@@ -57,6 +70,24 @@ const RevealGamepadController = ((Reveal: any) => {
         OVERVIEW: () => Reveal.toggleOverview(),
         AUTO_SLIDE: () => Reveal.toggleAutoSlide(),
         PAUSE: () => Reveal.togglePause(),
+        TOGGLE_SPOTLIGHT: () => {
+            spotlight.active = !spotlight.active;
+            spotlight.spot!.style.display = spotlight.active ? "inherit" : "none";
+            spotlight.position = [window.innerHeight / 2, window.innerWidth / 2];
+            spotlight.max = [window.innerHeight - spotlight.size, window.innerWidth - spotlight.size];
+        },
+        MOVE_SPOTLIGHT: (config: any) => (x: number, y: number) => {
+            if (spotlight.spot) {
+                requestAnimationFrame(() => {
+                    spotlight.position = [
+                        Math.min(Math.max(0, spotlight.position[0] + config.multiplier * x), spotlight.max[0]),
+                        Math.min(Math.max(0, spotlight.position[1] + config.multiplier * y), spotlight.max[1])
+                    ];
+                    spotlight.spot!.style.top = spotlight.position[0] + 'px';
+                    spotlight.spot!.style.left = spotlight.position[1] + 'px';
+                })
+            }
+        }
     });
 
     const MAPPINGS = {
@@ -73,8 +104,8 @@ const RevealGamepadController = ((Reveal: any) => {
                 {name: 'Select', idx: 10, action: REVEAL_ACTIONS.OVERVIEW},
                 {name: 'Start', idx: 11, action: REVEAL_ACTIONS.PAUSE},
                 {name: 'Special', idx: 12, action: REVEAL_ACTIONS.NONE},
-                {name: 'L3', idx: 13, action: REVEAL_ACTIONS.NONE},
-                {name: 'R3', idx: 14, action: REVEAL_ACTIONS.NONE},
+                {name: 'L3', idx: 13, action: REVEAL_ACTIONS.TOGGLE_SPOTLIGHT},
+                {name: 'R3', idx: 14, action: REVEAL_ACTIONS.TOGGLE_SPOTLIGHT},
             ],
             cross: [
                 {
@@ -87,8 +118,21 @@ const RevealGamepadController = ((Reveal: any) => {
                     ]
                 }
             ],
-            pointer: [
-                {name: 'Left Analog', idx: 3}
+            spotlight: [
+                {
+                    name: 'Left Analog',
+                    xIdx: 1,
+                    yIdx: 0,
+                    deadZone: 0.01,
+                    action: REVEAL_ACTIONS.MOVE_SPOTLIGHT({multiplier: 30})
+                },
+                {
+                    name: 'Right Analog',
+                    xIdx: 5,
+                    yIdx: 2,
+                    deadZone: 0.01,
+                    action: REVEAL_ACTIONS.MOVE_SPOTLIGHT({multiplier: 30})
+                }
             ]
         }
     } as { [key: string]: Mapping };
@@ -176,6 +220,22 @@ const RevealGamepadController = ((Reveal: any) => {
                         }
                     });
                     previousButtonsKey = allPressedButtonsKeys;
+
+                    // Managing analog sticks
+                    mapping.spotlight.forEach(sp => {
+                        const x = gp.axes[sp.xIdx];
+                        const y = gp.axes[sp.yIdx];
+
+                        if (x > sp.deadZone || x < -sp.deadZone || y > sp.deadZone || y < -sp.deadZone) {
+                            window.dispatchEvent(new CustomEvent('analog', {
+                                detail: {
+                                    key: sp.name,
+                                    action: sp.action,
+                                    x, y
+                                }
+                            }));
+                        }
+                    });
                 }
             }
 
@@ -183,6 +243,24 @@ const RevealGamepadController = ((Reveal: any) => {
                 const event: CustomEvent<{ action: Button | CrossAction, key: string }> = evt;
                 console.log('Pressed', event);
                 event.detail.action.action();
+            });
+
+            // Init spotlight
+            spotlight.spot = document.createElement("div");
+            document.body.appendChild(spotlight.spot);
+            spotlight.spot.style.display = "none";
+            spotlight.spot.style.pointerEvents = "none";
+            spotlight.spot.style.opacity = "0.5";
+            spotlight.spot.style.position = "absolute";
+            spotlight.spot.style.zIndex = '9999999999999';
+            spotlight.spot.style.width = "100px";
+            spotlight.spot.style.height = "100px";
+            spotlight.spot.style.boxShadow = "0 0 0 99999px rgba(0, 0, 0, .8)";
+            spotlight.spot.style.borderRadius = "50px";
+
+            window.addEventListener("analog", (evt: any) => {
+                const event: CustomEvent<{ action: AnalogAction, key: string, x: number, y: number }> = evt;
+                event.detail.action(event.detail.x, event.detail.y);
             });
         }
     };

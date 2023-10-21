@@ -114,12 +114,16 @@ Check the console and you'll be able to identify which button is what idx etc.
     - idx is the index of the axis to scan in the `gamepad.axes`
     - actions is an array of trigger options: at each loop, the cross emit the action which value is the closest to the axis value.
     - Don't forget to have an action doing nothing in rest position of your pad.
-- For `Pointer`:
-  - Soon
+- For `Spotlight`:
+  - names are here for logging purposes
+  - xIdx and yIdx are the indexes of the axis to scan in the `gamepad.axes`
+  - deadZone allows not to trigger if values are below a certain amount
+  - action is a `(x: number, y: number) => void`.
 
 Once done, please send me your mapping and precise pad model so that i can add it to the library for future users !
 
 #### Actions
 I defined several actions in `plugin.REVEAL_ACTIONS`. 
 Their names are normally self-explanatory, but feel free to take a look at the code if needed.
-These are just a simple `() => void` function. You can easily define your own.
+These are just a simple `() => void` function or `(x: number, y: number) => void` function (for analog ones). 
+You can easily define your own.
