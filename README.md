@@ -47,6 +47,22 @@ You can customize the duration between 2 loops of gamepad action detection, usin
 </script>
 ````
 
+#### Deactivate plugin on speaker notes
+If you use speaker notes, command will probably be given multiple times at once.
+To avoid that, I suggest deactivating the plugin on speaker page:
+````js
+    const urlParams = new URLSearchParams(window.location.search);
+    const receiver = urlParams.get('receiver');
+    const pluginOnlyOnMain = receiver !== null ? [] : [RevealGamepadController(Reveal)];
+
+    Reveal.initialize({
+        hash: true,
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [RevealMarkdown, RevealHighlight, RevealNotes, ...pluginOnlyOnMain ],
+    });
+````
+
 ### Custom Mapping
 
 #### Giving custom mapping in options
