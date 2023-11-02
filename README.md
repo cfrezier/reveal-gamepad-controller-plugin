@@ -24,6 +24,8 @@ You can use this module directly using this code, but these are my own mapping n
     });
 </script>
 ````
+This is available inside an ESModule, so you probably should use an `<script type="module">` tag.
+
 
 ### Configuration
 You can customize the duration between 2 loops of gamepad action detection, using `loopTime` option, and the mapping to use using `mapping` option.
